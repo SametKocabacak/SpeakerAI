@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>SpeakerAI - Meeting Intelligence</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <div class="hero">
+        <div class="overlay"></div>
+        <div class="hero-content">
+            <h1>SpeakerAI</h1>
+            <p>Transform meeting recordings into transcripts, identify speakers, and surface psychometric insights.</p>
+            <form class="upload-form" action="/analyze" method="post" enctype="multipart/form-data">
+                <label class="upload-label">
+                    Upload MP3 Recording
+                    <input type="file" name="file" accept="audio/mpeg" required>
+                </label>
+                <label class="team-label">
+                    Meeting Roster (comma separated)
+                    <input type="text" name="team_members" placeholder="Example: Alice Example, Bob Example">
+                </label>
+                <button type="submit">Analyze</button>
+            </form>
+        </div>
+    </div>
+</body>
+</html>
