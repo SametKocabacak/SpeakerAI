@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>SpeakerAI - Results</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Analysis Results</h1>
+            <a class="button" href="/">New Analysis</a>
+        </header>
+
+        <section class="downloads">
+            <h2>Outputs</h2>
+            <div class="download-links">
+                <a class="button" href="/download/transcript?path={{ meeting.transcript_path }}" target="_blank">Transcript</a>
+                <a class="button" href="/download/report?path={{ meeting.report_path }}" target="_blank">Speaker Report</a>
+            </div>
+        </section>
+
+        <section>
+            <h2>Speaker Findings</h2>
+            {% for profile in meeting.profiles %}
+            <div class="profile-card">
+                <h3>{{ profile.speaker_label }} {% if profile.matched_speaker_name %}- {{ profile.matched_speaker_name }}{% endif %}</h3>
+                <div class="profile-grid">
+                    <div>
+                        <h4>Statistics</h4>
+                        <ul>
+                            {% for key, value in profile.stats.items() %}
+                            <li><strong>{{ key }}:</strong> {{ value }}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    <div>
+                        <h4>Voice Features</h4>
+                        <ul>
+                            {% for key, value in profile.features.items() %}
+                            <li><strong>{{ key }}:</strong> {{ '%.3f'|format(value) }}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    <div>
+                        <h4>Psychometric Analysis</h4>
+                        <ul>
+                            {% for key, value in profile.psychometrics.items() %}
+                            <li><strong>{{ key }}:</strong> {{ '%.3f'|format(value) }}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="profile-actions">
+                    {% if profile.matched_speaker_id %}
+                    <form method="post" action="/confirm">
+                        <input type="hidden" name="speaker_label" value="{{ profile.speaker_label }}">
+                        <input type="hidden" name="speaker_id" value="{{ profile.matched_speaker_id }}">
+                        <p>Matched with {{ profile.matched_speaker_name }}. Would you like to confirm this match?</p>
+                        <button type="submit" name="confirm" value="yes">Confirm</button>
+                        <button type="submit" name="confirm" value="no">Reject</button>
+                    </form>
+                    {% else %}
+                    <form method="post" action="/register">
+                        <input type="hidden" name="speaker_label" value="{{ profile.speaker_label }}">
+                        <input type="hidden" name="transcript_path" value="{{ meeting.transcript_path }}">
+                        <input type="hidden" name="report_path" value="{{ meeting.report_path }}">
+                        <label>What is this speaker's name?
+                            <input type="text" name="speaker_name" required placeholder="Enter name">
+                        </label>
+                        <button type="submit">Save</button>
+                    </form>
+                    {% endif %}
+                </div>
+
+                {% if profile.inferred_names %}
+                <p class="hint">Possible names derived from the transcript: {{ profile.inferred_names | join(', ') }}</p>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </section>
+
+        <section>
+            <h2>Transcript</h2>
+            <table class="transcript-table">
+                <thead>
+                    <tr>
+                        <th>Speaker</th>
+                        <th>Start (s)</th>
+                        <th>End (s)</th>
+                        <th>Text</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for turn in meeting.turns %}
+                    <tr>
+                        <td>{{ turn.speaker_label }}</td>
+                        <td>{{ '%.2f'|format(turn.start) }}</td>
+                        <td>{{ '%.2f'|format(turn.end) }}</td>
+                        <td>{{ turn.text }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </section>
+    </div>
+</body>
+</html>
